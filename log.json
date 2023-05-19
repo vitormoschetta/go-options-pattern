@@ -1,0 +1,7 @@
+{
+    "level": "info",
+    "ts": "2023-04-24T12:30:34.308443Z",
+    "caller": "dependencies/cache.go:62",
+    "msg": "text for cache: summary:map[bu:Fintech cdu: channel: domain:generalcost from:2023-03-01 ldap: level1: level2: level3: nps: order_by: order_direction: page:%!s(int=0) page_size:%!s(int=0) product: reason_contact: reason_contact_group: resolution: site_id: source_group: sub_product: summaryType: to:2023-03-31 type: user_segment: user_type:]",
+    "request_id": "3327081c-644e-4d1c-9451-1e2f4d14800c"
+}

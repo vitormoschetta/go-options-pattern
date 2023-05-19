@@ -1,0 +1,59 @@
+SELECT
+    INFO.BUSINESS_UNIT AS bu,
+    INFO.SIT_SITE_ID AS site,
+    EXTRACT (YEAR
+             FROM
+             INFO.INCOMING_CASE_DT) AS year,
+  EXTRACT (MONTH
+  FROM
+    INFO.INCOMING_CASE_DT) AS month,
+    INFO.NIVEL_1 AS product,
+    INFO.NIVEL_2 AS sub_product,
+    INFO.NIVEL_3 AS reason,
+    INFO.SOURCE_NAME_GROUP AS source_group,
+  CASE
+    WHEN INFO.SOURCE_NAME_GROUP = 'Portal con Asistencia (Ayudas Asistidas)' THEN CAST(INFO.PROCESS_ID AS STRING)
+    WHEN INFO.SOURCE_NAME_GROUP = 'Shared Services' THEN CAST(INFO.PROCESS_ID AS STRING)
+  ELSE
+  INFO.CAS_FAQ_ID
+END
+AS item_id,
+  CASE
+    WHEN INFO.SOURCE_NAME_GROUP = 'Portal con Asistencia (Ayudas Asistidas)' THEN CONCAT(CAST(INFO.PROCESS_ID AS STRING),' - ',INFO.PROCESS_NAME)
+    WHEN INFO.SOURCE_NAME_GROUP = 'Shared Services' THEN CONCAT(CAST(INFO.PROCESS_ID AS STRING),' - ',INFO.PROCESS_NAME)
+  ELSE
+  FAQ_TITLE
+END
+AS item_name,
+  (CASE
+      WHEN INFO.SOURCE_NAME_GROUP = 'Portal con Asistencia (Ayudas Asistidas)' THEN 1
+      WHEN INFO.SOURCE_NAME_GROUP = 'Ayuda contextual/vertical' THEN 1
+      WHEN INFO.SOURCE_NAME_GROUP = 'Portal FAQs (informativas)' THEN 1
+    ELSE
+    0
+  END
+    ) AS grouped,
+  (CASE
+      WHEN INFO.SOURCE_NAME_GROUP = 'Ayuda contextual/vertical' THEN 1
+      WHEN INFO.SOURCE_NAME_GROUP = 'Portal FAQs (informativas)' THEN 1
+    ELSE
+    0
+  END
+    ) AS mario,
+  (CASE
+      WHEN INFO.SOURCE_NAME_GROUP = 'Ayuda contextual/vertical' THEN IFNULL(FAQS.TYPE,'-')
+      WHEN INFO.SOURCE_NAME_GROUP = 'Portal FAQs (informativas)' THEN IFNULL(FAQS.TYPE,'-')
+    ELSE '-'
+  END
+    ) AS type,
+  SUM(INFO.USD_INTERACTION_GESTION) AS cost_usd
+FROM
+  SBOX_CX_BI_ADS_CORE.CX_STUDIO_TABLE_SAMPLE AS INFO
+LEFT JOIN
+  SBOX_CX_BI_ADS_CORE.BT_CX_FAQS_DATA AS FAQS
+ON
+  INFO.CAS_FAQ_ID = CAST(FAQS.CONTENT_ID AS STRING)
+WHERE
+  INFO.NIVEL_1 IS NOT NULL
+  AND INFO.SIT_SITE_ID != 'HSP' [FILTERS]
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
